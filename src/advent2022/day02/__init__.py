@@ -1,6 +1,6 @@
-# ROCK: A X
-# PAPER: B Y
-# SCISSORS: C Z
+# ROCK: 0
+# PAPER: 1
+# SCISSORS: 2
 
 SCORES = [
     3, # draw: diff == 0
@@ -14,10 +14,14 @@ NAMES = {
     "C": "scissors", "Z": "scissors",
 }
 
-def score_round(me, opp, opts):
+def score_round(me, opp, opts, is_goal=False):
     opp_choice = ord(opp) - ord("A")
-    me_choice = ord(me) - ord("X")
-    diff = me_choice - opp_choice
+    if not is_goal:
+        me_choice = ord(me) - ord("X")
+        diff = me_choice - opp_choice
+    else:
+        diff = ord(me) - ord("X") - 1 # 0 -> lose; 1 -> draw; 2 -> win
+        me_choice = (opp_choice + diff) % 3
     score = SCORES[diff] + me_choice + 1
     if opts and opts.verbose:
         print(
@@ -26,38 +30,14 @@ def score_round(me, opp, opts):
         )
     return score
 
-def part1(lines, opts):
+def run_game(lines, opts, is_goal=False):
     score = 0
     for line in lines:
-        score += score_round(line[2], line[0], opts)
+        score += score_round(line[2], line[0], opts, is_goal=is_goal)
     return score
-
-def part2(lines, opts):
-    score = 0
-    for line in lines:
-        opponent = ord(line[0]) - ord("A")
-        me = ord(line[2]) - ord("X")
-        diff = me - opponent
-        this_score = SCORES[diff] + me + 1
-        if opts and opts.verbose:
-            print(
-                line.strip(),
-                "->",
-                NAMES[line[2]],
-                "vs.",
-                NAMES[line[0]],
-                "->",
-                SCORES[diff],
-                "+",
-                me,
-                "=",
-                this_score,
-            )
-        score += this_score
-    return score
-
 
 def main(stream, opts=None):
     lines = stream.readlines()
-    print("part 1 score:", part1(lines, opts))
+    print("part 1 score:", run_game(lines, opts, False))
+    print("part 2 score:", run_game(lines, opts, True))
 
