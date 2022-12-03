@@ -1,4 +1,4 @@
-def main(stream):
+def main(stream, opts=None):
     calories = sorted(
         sum(int(line.strip()) for line in section.split("\n") if line.strip())
         for section in stream.read().split("\n\n")
