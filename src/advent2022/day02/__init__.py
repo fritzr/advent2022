@@ -1,3 +1,5 @@
+import time
+
 # ROCK: 0
 # PAPER: 1
 # SCISSORS: 2
@@ -37,7 +39,9 @@ def run_game(lines, opts, is_goal=False):
     return score
 
 def main(stream, opts=None):
+    start = time.time()
     lines = stream.readlines()
     print("part 1 score:", run_game(lines, opts, False))
     print("part 2 score:", run_game(lines, opts, True))
-
+    if opts.time:
+        print("time: ", time.time() - start)

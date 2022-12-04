@@ -1,3 +1,4 @@
+import time
 
 def priority(char):
     code = ord(char)
@@ -27,6 +28,7 @@ def find_common(groups):
     return common
 
 def main(stream, opts):
+    start = time.time()
     lines = [line.strip() for line in stream.readlines()]
 
     prisum = 0
@@ -40,3 +42,5 @@ def main(stream, opts):
         assert(len(common) == 1)
         prisum += priority(common.pop())
     print("part 2:", prisum)
+    if opts.time:
+        print("time: ", time.time() - start)

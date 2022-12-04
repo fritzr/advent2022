@@ -7,8 +7,10 @@
 
 import os
 import io
+import bdb
 import pdb
 import sys
+import time
 import weakref
 import argparse
 import traceback
@@ -21,6 +23,7 @@ def parse_args(args):
     )
     p.add_argument("-P", "--pdb", action="store_true", help="Debug with PDB.")
     p.add_argument("-v", "--verbose", action="store_true", help="More output.")
+    p.add_argument("-t", "--time", action="store_true", help="Profile runtime.")
     i = p.add_argument_group("Input Options")
     m = i.add_mutually_exclusive_group()
     m.add_argument(
@@ -61,7 +64,7 @@ def day_modules(days, opts):
         try:
             day_module = import_module("." + day_name, "advent2022")
         except (ImportError, ModuleNotFoundError) as e:
-            if not all_days:
+            if opts.days and not opts.all:
                 print(f"warning: no such day {day}", file=sys.stderr)
         else:
             if hasattr(day_module, "main"):
@@ -70,19 +73,23 @@ def day_modules(days, opts):
                     input = io.TextIOWrapper(
                         pkg_resources.resource_stream(day_module.__name__, "input.txt")
                     )
+                    input = weakref.proxy(input, input.close)
                 yield day_module, input
 
 def main(args=sys.argv[1:]):
     opts = parse_args(args)
     modules = day_modules(opts.days or range(1, 26), opts)
-    if opts.days is None:
-        modules = tuple(modules)[-1]
+    if not opts.days:
+        modules = (tuple(modules)[-1],)
+    start = time.time()
     for module, input_stream in modules:
         print(module.__name__.split(".")[-1])
         if opts.pdb:
             pdb.runcall(day_module.main, input_stream, opts)
         else:
             module.main(input_stream, opts)
+    if opts.time:
+        print("total time:", time.time() - start)
 
 if __name__ == "__main__":
     try:
@@ -91,6 +98,8 @@ if __name__ == "__main__":
         sys.exit(1)
     except OSError:
         raise
+    except bdb.BdbQuit:
+        sys.exit(1)
     except Exception:
         traceback.print_exc()
         pdb.post_mortem()
