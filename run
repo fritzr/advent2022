@@ -1,2 +1,2 @@
 #!/bin/bash
-cd src && exec /usr/bin/env python3 -m advent2022 "$@"
+exec /usr/bin/env PYTHONPATH="$PWD/src:${PYTHONPATH}" python3 -m advent2022 "$@"
