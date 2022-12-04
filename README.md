@@ -1,6 +1,6 @@
 # advent2022
 
-Days completed:
+Days completed (click links for source code):
 
 * [x] [day 1](src/advent2022/day01/__init__.py)
 * [x] [day 2](src/advent2022/day02/__init__.py)
