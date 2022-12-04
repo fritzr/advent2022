@@ -34,7 +34,7 @@ def parse_args(args):
         dest="input",
         help="Read from stdin.",
     )
-    m.add_argument("-i", "--input", help="Input file (instead of day/input.txt")
+    m.add_argument("-i", "--input", help="Input file (instead of day/input.txt)")
     m.add_argument("-a", "--all", action="store_true", help="Run all days.")
     p.add_argument(
         "days",

@@ -1,5 +1,10 @@
 # advent2022
 
+Puzzle solutions for [Advent of Code 2022](https://adventofcode.com/2022) in
+Python (for now).
+
+# Sources
+
 Days completed (click links for source code):
 
 * [x] [day 1](src/advent2022/day01/__init__.py)
@@ -27,3 +32,38 @@ Days completed (click links for source code):
 * [ ] [day 23](src/advent2022/day23/__init__.py)
 * [ ] [day 24](src/advent2022/day24/__init__.py)
 * [ ] [day 25](src/advent2022/day25/__init__.py)
+
+# Running
+
+The `./run` script wraps the driver for the [advent2022](src/advent2022/__main__.py)
+package.  By default, it runs the latest day, but it also accepts a list of days
+on the command-line. The default for each day is to read the baked-in input from
+my advent2022 account. The driver also accepts an argument to read input from
+a different file (which obviously only makes sense when running a single day).
+
+# Usage
+
+```
+usage: advent2022 [-h] [-P] [-v] [-t] [-I | -i INPUT | -a] ...
+
+Run advent 2022 day-specific problems.
+
+positional arguments:
+  days                  Day(s) to run.
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -P, --pdb             Debug with PDB.
+  -v, --verbose         More output.
+  -t, --time            Profile runtime.
+
+Input Options:
+  -I, --stdin           Read from stdin.
+  -i INPUT, --input INPUT
+                        Input file (instead of day/input.txt)
+  -a, --all             Run all days.
+```
+
+# Dependencies
+
+All scripts use standard library modules and expect Python >= 3.4.
