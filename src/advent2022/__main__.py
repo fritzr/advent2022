@@ -85,7 +85,7 @@ def main(args=sys.argv[1:]):
     for module, input_stream in modules:
         print(module.__name__.split(".")[-1])
         if opts.pdb:
-            pdb.runcall(day_module.main, input_stream, opts)
+            pdb.runcall(module.main, input_stream, opts)
         else:
             module.main(input_stream, opts)
     if opts.time:
