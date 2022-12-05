@@ -10,10 +10,9 @@ def main(stream, opts):
         if not line or "[" not in line:
             stream.readline() # skip crate indexes
             break
-        for crate_id, crate_index in enumerate(range(0, len(line), 4)):
-            crate = line[crate_index:crate_index+3].strip()
-            if crate:
-                p1stacks[crate_id].appendleft(crate[1:-1]) # strip '[]'
+        for crate_id, crate in enumerate(line[1::4]):
+            if crate != " ":
+                p1stacks[crate_id].appendleft(crate) # strip '[]'
 
     if opts.verbose:
         for index, stack in enumerate(p1stacks):
