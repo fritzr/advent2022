@@ -2,24 +2,23 @@ from operator import mul
 from functools import reduce
 
 def scenic_score(forest, row, col, opts):
-    score = 1
     viewable = False
-    dir_scores = [0, 0, 0, 0]
+    visible = [0, 0, 0, 0] # left, right, above, below
     for dir_id, colrange in enumerate((range(col-1, -1, -1), range(col+1, len(forest[row])))):
         for ocol in colrange:
-            dir_scores[dir_id] += 1
+            visible[dir_id] += 1
             if forest[row][ocol] >= forest[row][col]:
                 break
         else:
             viewable = True
     for dir_id, rowrange in enumerate((range(row-1, -1, -1), range(row+1, len(forest)))):
         for orow in rowrange:
-            dir_scores[dir_id + 2] += 1
+            visible[dir_id + 2] += 1
             if forest[orow][col] >= forest[row][col]:
                 break
         else:
             viewable = True
-    return viewable, reduce(mul, dir_scores)
+    return viewable, reduce(mul, visible)
 
 def main(stream, opts):
     forest = [line[:-1] for line in stream.readlines()]
