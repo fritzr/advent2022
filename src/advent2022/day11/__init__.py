@@ -1,24 +1,11 @@
 from collections import deque
 from operator import mul, add
+from functools import reduce
 
 operands = {
     "*": mul,
     "+": add,
 }
-
-class ModSet:
-    def __init__(self, num, divisors):
-        self.mods = dict((divisor, (num % divisor)) for divisor in divisors)
-
-    def transform(self, func):
-        for divisor, remainder in self.mods.items():
-            self.mods[divisor] = func(remainder) % divisor
-
-    def divisible(self, divisor):
-        return self.mods[divisor] == 0
-
-    def __repr__(self):
-        return f"{type(self).__name__}({self.mods!r})"
 
 class Monkey:
     def __init__(self, id, items, op, test, true_monkey, false_monkey):
@@ -36,33 +23,30 @@ class Monkey:
             num if self.rop == "old" else self.rop,
         )
 
+    def finish_op(self, num):
+        return num // 3
+
     def inspect(self):
         while self.items:
             self.inspections += 1
             item = self.items.popleft()
-            item = self.do_op(item) // 3
+            item = self.finish_op(self.do_op(item))
             yield item, (self.true_monkey if item % self.test == 0 else self.false_monkey)
 
 class ModMonkey(Monkey):
     @classmethod
-    def clone(cls, o, divisors):
+    def clone(cls, o, divisor):
         return cls(
-            divisors, o.id, o.items, (o.lop, o.op, o.rop), o.test,
+            divisor, o.id, o.items, (o.lop, o.op, o.rop), o.test,
             o.true_monkey, o.false_monkey
         )
 
-    def __init__(self, divisors, *args):
+    def __init__(self, divisor, *args):
         super().__init__(*args)
-        self.items = deque(ModSet(item, divisors) for item in self.items)
+        self.divisor = divisor
 
-    def inspect(self):
-        while self.items:
-            self.inspections += 1
-            modset = self.items.popleft()
-            modset.transform(self.do_op)
-            yield modset, (
-                self.true_monkey if modset.divisible(self.test) else self.false_monkey
-            )
+    def finish_op(self, num):
+        return num % self.divisor
 
 def monkey_around(monkeys):
     for monkey in monkeys:
@@ -94,8 +78,8 @@ def main(stream, opts):
         ))
 
     # initialize smarter phase 2 monkes
-    divisors = [monkey.test for monkey in monkeys]
-    mod_monkeys = [ModMonkey.clone(monkey, divisors) for monkey in monkeys]
+    divisor = reduce(mul, (monkey.test for monkey in monkeys))
+    mod_monkeys = [ModMonkey.clone(monkey, divisor) for monkey in monkeys]
 
     for _ in range(20):
         monkey_around(monkeys)
