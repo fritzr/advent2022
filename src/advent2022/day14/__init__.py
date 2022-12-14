@@ -12,6 +12,32 @@ def pairs(it):
     except StopIteration:
         pass
 
+def in_range(coord, range):
+    return range[0] <= coord < range[1]
+
+def in_bounds(cave, point, col_range):
+    return point[0] < len(cave) and in_range(point[1], col_range)
+
+def lookup(cave, point, col_range):
+    return cave[point[0]][point[1] - col_range[0]]
+
+def simulate_sand(cave, sand, col_range):
+    while in_bounds(cave, sand, col_range):
+        did_fall = False
+        for fall_point in (
+                (sand[0] + 1, sand[1]), # down
+                (sand[0] + 1, sand[1] - 1), # down-left
+                (sand[0] + 1, sand[1] + 1), # down-right
+            ):
+            if not in_bounds(cave, fall_point, col_range):
+                return None # sand falls into the void
+            if lookup(cave, fall_point, col_range) == '.':
+                sand = fall_point
+                break
+        else:
+            return sand
+    return None
+
 def main(stream, opts):
     rocklines = []
     row_range = [sys.maxsize, 0]
@@ -34,7 +60,7 @@ def main(stream, opts):
     col_range[1] += 1
     #col_span = col_range[1] - col_range[0]
     #row_span = row_range[1] - row_range[0]
-    cave = [["." for col in range(*col_range)] for row in range(*row_range) ]
+    cave = [["." for col in range(*col_range)] for row in range(0, row_range[1]) ]
 
     for rockline in rocklines:
         for start, end in pairs(rockline):
@@ -55,8 +81,29 @@ def main(stream, opts):
                 else:
                     row = const
                     col = coord
-                cave[row - row_range[0]][col - col_range[0]] = '#'
+                cave[row][col - col_range[0]] = '#'
 
     if opts.verbose:
-        for row in range(*row_range):
-            print(f"{row:3d}", " ".join(cave[row - row_range[0]]))
+        print()
+        for digit in range(2, -1, -1):
+            print("   ", end="")
+            for col in range(*col_range):
+                print(" ", end="")
+                print((col % 10**(digit+1)) // 10**digit, end="")
+            print()
+        for row in range(len(cave)):
+            print(f"{row:3d}", " ".join(cave[row]))
+        print()
+
+    sand_in = (0, 500)
+    sand_out = sand_in
+    step = 0
+    while sand_out is not None:
+        sand_out = simulate_sand(cave, sand_in, col_range)
+        if opts.verbose:
+            print(f"step {step:3d}: sand fell to {sand_out}")
+        if sand_out is not None:
+            cave[sand_out[0]][sand_out[1] - col_range[0]] = 'o'
+            step += 1
+
+    print("part 1:", step)
